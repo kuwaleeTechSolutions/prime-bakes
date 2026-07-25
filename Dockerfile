@@ -14,6 +14,8 @@ RUN docker-php-ext-install pdo pdo_mysql zip
 
 RUN a2enmod rewrite
 
+COPY apache.conf /etc/apache2/sites-available/000-default.conf
+
 COPY . .
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -31,7 +33,3 @@ RUN chown -R www-data:www-data storage bootstrap/cache
 EXPOSE 80
 
 CMD ["apache2-foreground"]
-
-RUN a2enmod rewrite
-
-COPY apache.conf /etc/apache2/sites-available/000-default.conf
