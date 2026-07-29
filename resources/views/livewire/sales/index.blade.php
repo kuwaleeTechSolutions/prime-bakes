@@ -27,7 +27,7 @@
         <table class="table-base">
             <thead>
                 <tr>
-                    <th>Reference</th><th>Customer</th><th>Warehouse</th><th>Cashier</th>
+                    <th>Date</th><th>Customer</th><th>Warehouse</th><th>Cashier</th>
                     <th class="text-right">Grand total</th><th class="text-right">Due</th>
                     <th>Status</th><th>Payment</th><th></th>
                 </tr>
@@ -35,7 +35,7 @@
             <tbody>
                 @forelse ($sales as $sale)
                     <tr wire:key="sale-{{ $sale->id }}">
-                        <td class="font-medium">#{{ $sale->reference_no }}</td>
+                        <td class="font-medium">{{ $sale->created_at }}</td>
                         <td>{{ $sale->customer?->name }}</td>
                         <td>{{ $sale->warehouse?->name }}</td>
                         <td>{{ $sale->user?->name }}</td>

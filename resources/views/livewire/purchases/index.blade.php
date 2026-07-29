@@ -34,7 +34,7 @@
         <table class="table-base">
             <thead>
                 <tr>
-                    <th>Reference</th><th>Supplier</th><th>Warehouse</th>
+                    <th>Date</th><th>Supplier</th><th>Warehouse</th>
                     <th class="text-right">Grand total</th><th class="text-right">Due</th>
                     <th>Status</th><th>Payment</th><th></th>
                 </tr>
@@ -42,7 +42,7 @@
             <tbody>
                 @forelse ($purchases as $purchase)
                     <tr wire:key="purchase-{{ $purchase->id }}">
-                        <td class="font-medium">{{ $purchase->reference_no }}</td>
+                        <td class="font-medium">{{ $purchase->created_at }}</td>
                         <td>{{ $purchase->supplier?->name ?? '—' }}</td>
                         <td>{{ $purchase->warehouse?->name }}</td>
                         <td class="text-right">₹{{ number_format($purchase->grand_total, 2) }}</td>

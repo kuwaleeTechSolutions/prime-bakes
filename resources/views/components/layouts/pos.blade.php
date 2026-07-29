@@ -23,7 +23,15 @@
                     </svg>
                     <span class="text-sm font-semibold">{{ config('app.name', 'Retailo POS') }}</span>
                 </a>
-                <span class="rounded-md border border-border px-2 py-0.5 text-xs text-text-secondary">{{ session('active_warehouse', 'POS') }}</span>
+                @if (isset($cashRegister))
+    <a href="{{ route('cash-register.close', $cashRegister) }}"
+       title="Click to close this register and switch stores"
+       class="rounded-md border border-border px-2 py-0.5 text-xs text-text-secondary hover:bg-surface-3 hover:text-text-primary">
+        {{ $cashRegister->warehouse->name ?? 'POS' }}
+    </a>
+@else
+    <span class="rounded-md border border-border px-2 py-0.5 text-xs text-text-secondary">POS</span>
+@endif
             </div>
 
             <div class="flex items-center gap-3 text-xs text-text-secondary">
