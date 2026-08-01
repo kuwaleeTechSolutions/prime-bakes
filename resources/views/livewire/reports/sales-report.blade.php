@@ -45,7 +45,7 @@
                 @forelse ($sales as $sale)
                     <tr wire:key="sr-{{ $sale->id }}">
                         <td class="font-medium">#{{ $sale->reference_no }}</td>
-                        <td>{{ $sale->created_at->format('d M Y') }}</td>
+                        <td>{{ $sale->sale_date?->format('d M Y') ?? $sale->created_at->format('d M Y') }}</td>
                         <td>{{ $sale->customer?->name }}</td>
                         <td>{{ $sale->warehouse?->name }}</td>
                         <td class="text-right">₹{{ number_format($sale->grand_total, 2) }}</td>

@@ -21,14 +21,14 @@ class SalesReport extends Component
     protected function query()
     {
         return Sale::query()
-            ->whereDate('created_at', '>=', $this->from_date)
-            ->whereDate('created_at', '<=', $this->to_date)
+            ->whereDate('sale_date', '>=', $this->from_date)
+            ->whereDate('sale_date', '<=', $this->to_date)
             ->when($this->warehouseFilter, fn ($q) => $q->where('warehouse_id', $this->warehouseFilter));
     }
 
     public function render()
     {
-        $sales = (clone $this->query())->with(['customer', 'warehouse'])->latest()->paginate(20);
+        $sales = (clone $this->query())->with(['customer', 'warehouse'])->latest('sale_date')->paginate(20);
 
         $totals = (clone $this->query())->selectRaw('
             COUNT(*) as sale_count,

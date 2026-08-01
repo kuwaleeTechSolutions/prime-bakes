@@ -34,7 +34,7 @@
         <table class="table-base">
             <thead>
                 <tr>
-                    <th>Date</th><th>Supplier</th><th>Warehouse</th>
+                    <th>Reference</th><th>Date</th><th>Supplier</th><th>Warehouse</th>
                     <th class="text-right">Grand total</th><th class="text-right">Due</th>
                     <th>Status</th><th>Payment</th><th></th>
                 </tr>
@@ -42,7 +42,8 @@
             <tbody>
                 @forelse ($purchases as $purchase)
                     <tr wire:key="purchase-{{ $purchase->id }}">
-                        <td class="font-medium">{{ $purchase->created_at }}</td>
+                        <td class="font-medium">{{ $purchase->reference_no }}</td>
+                        <td>{{ $purchase->purchase_date?->format('d M Y') ?? $purchase->created_at->format('d M Y') }}</td>
                         <td>{{ $purchase->supplier?->name ?? '—' }}</td>
                         <td>{{ $purchase->warehouse?->name }}</td>
                         <td class="text-right">₹{{ number_format($purchase->grand_total, 2) }}</td>
@@ -52,7 +53,7 @@
                         <td class="text-right"><a href="{{ route('purchases.edit', $purchase) }}" class="text-text-accent text-xs hover:underline">View / Edit</a></td>
                     </tr>
                 @empty
-                    <tr><td colspan="8" class="py-8 text-center text-text-muted">No purchases yet.</td></tr>
+                    <tr><td colspan="9" class="py-8 text-center text-text-muted">No purchases yet.</td></tr>
                 @endforelse
             </tbody>
         </table>

@@ -27,7 +27,7 @@
         <table class="table-base">
             <thead>
                 <tr>
-                    <th>Date</th><th>Customer</th><th>Warehouse</th><th>Cashier</th>
+                    <th>Reference</th><th>Date</th><th>Customer</th><th>Warehouse</th><th>Cashier</th>
                     <th class="text-right">Grand total</th><th class="text-right">Due</th>
                     <th>Status</th><th>Payment</th><th></th>
                 </tr>
@@ -35,7 +35,8 @@
             <tbody>
                 @forelse ($sales as $sale)
                     <tr wire:key="sale-{{ $sale->id }}">
-                        <td class="font-medium">{{ $sale->created_at }}</td>
+                        <td class="font-medium">#{{ $sale->reference_no }}</td>
+                        <td>{{ $sale->sale_date?->format('d M Y') ?? $sale->created_at->format('d M Y') }}</td>
                         <td>{{ $sale->customer?->name }}</td>
                         <td>{{ $sale->warehouse?->name }}</td>
                         <td>{{ $sale->user?->name }}</td>
@@ -46,7 +47,7 @@
                         <td class="text-right"><a href="{{ route('sales.show', $sale) }}" class="text-text-accent text-xs hover:underline">View</a></td>
                     </tr>
                 @empty
-                    <tr><td colspan="9" class="py-8 text-center text-text-muted">No sales yet.</td></tr>
+                    <tr><td colspan="10" class="py-8 text-center text-text-muted">No sales yet.</td></tr>
                 @endforelse
             </tbody>
         </table>

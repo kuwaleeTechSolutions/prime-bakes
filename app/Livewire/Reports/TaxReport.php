@@ -17,16 +17,17 @@ class TaxReport extends Component
         $this->to_date = now()->toDateString();
     }
 
-    protected function inRange($query)
-    {
-        return $query->whereDate('created_at', '>=', $this->from_date)
-            ->whereDate('created_at', '<=', $this->to_date);
-    }
-
     public function render()
     {
-        $taxCollected = $this->inRange(Sale::query())->sum('total_tax');
-        $taxPaid = $this->inRange(Purchase::query())->sum('total_tax');
+        $taxCollected = Sale::query()
+            ->whereDate('sale_date', '>=', $this->from_date)
+            ->whereDate('sale_date', '<=', $this->to_date)
+            ->sum('total_tax');
+
+        $taxPaid = Purchase::query()
+            ->whereDate('purchase_date', '>=', $this->from_date)
+            ->whereDate('purchase_date', '<=', $this->to_date)
+            ->sum('total_tax');
 
         return view('livewire.reports.tax-report', [
             'taxCollected' => $taxCollected,

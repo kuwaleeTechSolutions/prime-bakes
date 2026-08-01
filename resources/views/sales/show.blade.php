@@ -1,6 +1,12 @@
 <x-layouts.app :header="'Sale #' . $sale->reference_no">
     <div class="max-w-3xl">
 
+        <div class="mb-4 flex justify-end">
+            <a href="{{ route('sales.receipt', $sale) }}" target="_blank" class="btn-primary">
+                Print receipt
+            </a>
+        </div>
+
         @if (session('success'))
             <div class="mb-4 rounded-lg border border-primary-400/40 bg-primary-50 px-3 py-2 text-sm text-primary-600">{{ session('success') }}</div>
         @endif
@@ -19,8 +25,8 @@
                 <div class="font-medium">{{ $sale->user?->name }}</div>
             </div>
             <div>
-                <div class="text-xs text-text-secondary">Date</div>
-                <div class="font-medium">{{ $sale->created_at->format('d M Y, h:i A') }}</div>
+                <div class="text-xs text-text-secondary">Sale date</div>
+                <div class="font-medium">{{ $sale->sale_date?->format('d M Y') ?? $sale->created_at->format('d M Y') }}</div>
             </div>
         </div>
 
@@ -64,12 +70,6 @@
                 <div class="flex justify-between {{ $sale->due > 0 ? 'text-status-unpaid' : '' }}"><span>Due</span><span>₹{{ number_format($sale->due, 2) }}</span></div>
                 <div class="pt-2"><span class="pill-{{ $sale->payment_status }}">{{ ucfirst($sale->payment_status) }}</span></div>
             </div>
-        </div>
-
-        <div class="mb-4 flex justify-end">
-            <a href="{{ route('sales.receipt', $sale) }}" target="_blank" class="btn-primary">
-                Print receipt
-            </a>
         </div>
 
     </div>

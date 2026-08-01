@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Account;
-use App\Models\CashRegister;
 use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\Sale;
@@ -40,7 +39,10 @@ class SaleService
         ?string $orderDiscountType = 'Flat',
         float $shippingCost = 0,
         ?string $saleNote = null,
+        ?string $saleDate = null,
     ): Sale {
+        $saleDate ??= now()->toDateString();
+
         // Fail fast, before writing anything, if any line is short on stock.
         foreach ($lines as $line) {
             $available = $this->stock->stockOf($line['product_id'], $warehouseId);
@@ -51,7 +53,7 @@ class SaleService
 
         return DB::transaction(function () use (
             $warehouseId, $customerId, $billerId, $cashRegisterId, $userId,
-            $lines, $payment, $orderDiscount, $orderDiscountType, $shippingCost, $saleNote
+            $lines, $payment, $orderDiscount, $orderDiscountType, $shippingCost, $saleNote, $saleDate
         ) {
             $lineTotals = array_map(fn ($l) => round(
                 $l['qty'] * $l['net_unit_price'] - $l['discount']
@@ -69,6 +71,7 @@ class SaleService
                 'customer_id' => $customerId,
                 'warehouse_id' => $warehouseId,
                 'biller_id' => $billerId,
+                'sale_date' => $saleDate,
                 'item' => count($lines),
                 'total_qty' => array_sum(array_column($lines, 'qty')),
                 'total_discount' => array_sum(array_column($lines, 'discount')),
@@ -118,7 +121,6 @@ class SaleService
             }
 
             // Loyalty: 1 point per ₹100 spent — a simple, editable default.
-            // Adjust the divisor (or make it a setting) once the Settings module exists.
             $customer = Customer::find($customerId);
             $customer?->addPoints(floor($grandTotal / 100));
             $customer?->recordExpense($grandTotal);

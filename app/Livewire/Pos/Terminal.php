@@ -18,6 +18,7 @@ class Terminal extends Component
     public string $productSearch = '';
     public ?int $customer_id = null;
     public ?int $biller_id = null;
+    public string $sale_date;
 
     // Each: product_id, product_name, qty, sale_unit_id, sale_unit_code, net_unit_price, discount, tax_rate, available_qty
     public array $cart = [];
@@ -34,6 +35,7 @@ class Terminal extends Component
     public function mount(CashRegister $cashRegister): void
     {
         $this->cashRegister = $cashRegister;
+        $this->sale_date = now()->toDateString();
 
         // Falls back to the first active customer (seed a "Walk-in Customer" row)
         // if no default is configured yet — see README.
@@ -162,6 +164,7 @@ class Terminal extends Component
         $this->validate([
             'customer_id' => ['required', 'exists:customers,id'],
             'account_id' => ['required', 'exists:accounts,id'],
+            'sale_date' => ['required', 'date'],
             'cart' => ['required', 'array', 'min:1'],
         ]);
 
@@ -181,6 +184,7 @@ class Terminal extends Component
                 ],
                 orderDiscount: $this->order_discount,
                 shippingCost: $this->shipping_cost,
+                saleDate: $this->sale_date,
             );
         } catch (\RuntimeException $e) {
             $this->addError('cart', $e->getMessage());
@@ -188,6 +192,7 @@ class Terminal extends Component
         }
 
         $this->reset(['cart', 'order_discount', 'shipping_cost', 'tendered', 'showPayment']);
+        $this->sale_date = now()->toDateString();
 
         session()->flash('success', "Sale #{$sale->reference_no} completed.");
 

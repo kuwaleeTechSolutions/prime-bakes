@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Purchase extends Model
 {
     protected $fillable = [
-        'reference_no', 'invoice_number', 'user_id', 'warehouse_id', 'supplier_id',
+        'reference_no', 'invoice_number', 'user_id', 'warehouse_id', 'supplier_id', 'purchase_date',
         'item', 'total_qty', 'total_discount', 'total_tax', 'total_cost',
         'order_tax_rate', 'order_tax', 'order_discount', 'shipping_cost',
         'grand_total', 'paid_amount', 'status', 'payment_status', 'document', 'note',
     ];
 
     protected $casts = [
+        'purchase_date' => 'date',
         'total_qty' => 'float',
         'grand_total' => 'float',
         'paid_amount' => 'float',

@@ -21,14 +21,14 @@ class PurchaseReport extends Component
     protected function query()
     {
         return Purchase::query()
-            ->whereDate('created_at', '>=', $this->from_date)
-            ->whereDate('created_at', '<=', $this->to_date)
+            ->whereDate('purchase_date', '>=', $this->from_date)
+            ->whereDate('purchase_date', '<=', $this->to_date)
             ->when($this->warehouseFilter, fn ($q) => $q->where('warehouse_id', $this->warehouseFilter));
     }
 
     public function render()
     {
-        $purchases = (clone $this->query())->with(['supplier', 'warehouse'])->latest()->paginate(20);
+        $purchases = (clone $this->query())->with(['supplier', 'warehouse'])->latest('purchase_date')->paginate(20);
 
         $totals = (clone $this->query())->selectRaw('
             COUNT(*) as purchase_count,

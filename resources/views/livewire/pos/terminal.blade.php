@@ -56,13 +56,20 @@
         </div>
 
         <div class="mt-3 space-y-2 border-t border-border pt-3">
-            <div>
-                <label class="field-label">Customer</label>
-                <select wire:model="customer_id" class="field-input">
-                    @foreach ($customers as $customer)
-                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                    @endforeach
-                </select>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="field-label">Customer</label>
+                    <select wire:model="customer_id" class="field-input">
+                        @foreach ($customers as $customer)
+                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Sale date</label>
+                    <input type="date" wire:model="sale_date" class="field-input">
+                    @error('sale_date') <p class="mt-1 text-xs text-status-unpaid">{{ $message }}</p> @enderror
+                </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">

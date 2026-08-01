@@ -7,7 +7,6 @@ use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\Warehouse;
 use App\Services\StockService;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -23,6 +22,7 @@ class Form extends Component
     public ?int $warehouse_id = null;
     public ?int $supplier_id = null;
     public string $invoice_number = '';
+    public string $purchase_date;
     public float $order_discount = 0;
     public float $order_tax_rate = 0;
     public float $shipping_cost = 0;
@@ -38,13 +38,18 @@ class Form extends Component
 
     public function mount(?Purchase $purchase = null): void
     {
+        $this->purchase_date = now()->toDateString();
+
         if ($purchase?->exists) {
             $this->purchaseId = $purchase->id;
             $this->originalStatus = $purchase->status;
             $this->fill($purchase->only([
-                'warehouse_id', 'supplier_id', 'invoice_number', 'order_discount',
+                'warehouse_id', 'supplier_id', 'invoice_number', 'purchase_date', 'order_discount',
                 'order_tax_rate', 'shipping_cost', 'paid_amount', 'status', 'payment_status', 'note',
             ]));
+            // purchase_date comes back from the DB as a Carbon instance via the model
+            // cast — the date input needs a plain 'Y-m-d' string.
+            $this->purchase_date = $purchase->purchase_date?->toDateString() ?? now()->toDateString();
 
             $this->lines = $purchase->lines->map(fn ($line) => [
                 'product_id' => $line->product_id,
@@ -129,6 +134,7 @@ class Form extends Component
         $this->validate([
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'supplier_id' => ['nullable', 'exists:suppliers,id'],
+            'purchase_date' => ['required', 'date'],
             'lines' => ['required', 'array', 'min:1'],
         ], [
             'lines.required' => 'Add at least one product line before saving.',
@@ -136,7 +142,7 @@ class Form extends Component
 
         $totals = $this->totals;
 
-        DB::transaction(function () use ($totals) {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($totals) {
             $purchase = Purchase::updateOrCreate(['id' => $this->purchaseId], [
                 'reference_no' => $this->purchaseId
                     ? Purchase::find($this->purchaseId)->reference_no
@@ -145,6 +151,7 @@ class Form extends Component
                 'user_id' => auth()->id(),
                 'warehouse_id' => $this->warehouse_id,
                 'supplier_id' => $this->supplier_id,
+                'purchase_date' => $this->purchase_date,
                 'item' => $totals['item_count'],
                 'total_qty' => $totals['total_qty'],
                 'total_discount' => $totals['total_discount'],
@@ -161,15 +168,13 @@ class Form extends Component
                 'note' => $this->note ?: null,
             ]);
 
-            // Replace line items wholesale — simplest correct approach for a form
-            // that re-renders the full line set each save.
             $purchase->lines()->delete();
 
             foreach ($this->lines as $index => $line) {
                 $purchase->lines()->create([
                     'product_id' => $line['product_id'],
                     'qty' => $line['qty'],
-                    'recieved' => $line['qty'], // assume full receipt unless a partial-receiving workflow is added later
+                    'recieved' => $line['qty'],
                     'purchase_unit_id' => $line['purchase_unit_id'],
                     'net_unit_cost' => $line['net_unit_cost'],
                     'discount' => $line['discount'],
@@ -179,8 +184,6 @@ class Form extends Component
                 ]);
             }
 
-            // Only push stock in the moment status transitions INTO "received" —
-            // never on every save, or re-saving a received purchase would double-count stock.
             if ($this->status === 'received' && $this->originalStatus !== 'received') {
                 $stock = app(StockService::class);
                 foreach ($this->lines as $line) {

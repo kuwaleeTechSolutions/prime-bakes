@@ -4,8 +4,6 @@
 <meta charset="utf-8">
 <title>Receipt #{{ $sale->reference_no }}</title>
 <style>
-    /* 80mm is the standard TSP100 paper width. If your printer is set up
-       for the 58mm variant instead, change both values below to 58mm. */
     @page { size: 80mm auto; margin: 0; }
 
     * { box-sizing: border-box; }
@@ -63,7 +61,7 @@
     <div class="rule"></div>
 
     <div>Invoice: <span class="bold">#{{ $sale->reference_no }}</span></div>
-    <div>Date: {{ $sale->sale_date->format('d-m-Y h:i A') }}</div>
+    <div>Date: {{ ($sale->sale_date ?? $sale->created_at)->format('d-m-Y') }} {{ $sale->created_at->format('h:i A') }}</div>
     <div>Cashier: {{ $sale->user?->name }}</div>
     <div>Customer: {{ $sale->customer?->name ?? 'Walk-in' }}</div>
 
@@ -130,10 +128,6 @@
     </div>
 
     <script>
-        // Auto-opens the print dialog as soon as the receipt loads, so the
-        // cashier doesn't have to click anything for the common case —
-        // the manual "Print receipt" button above is there as a fallback
-        // if the browser blocks auto-print or they need to print again.
         window.onload = function () {
             window.print();
         };

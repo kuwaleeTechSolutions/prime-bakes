@@ -1,7 +1,7 @@
 <div class="max-w-4xl">
     <form wire:submit="save" class="space-y-4">
 
-        <div class="card grid grid-cols-3 gap-4">
+        <div class="card grid grid-cols-4 gap-4">
             <div>
                 <label class="field-label">Warehouse</label>
                 <select wire:model="warehouse_id" class="field-input">
@@ -24,6 +24,11 @@
             <div>
                 <label class="field-label">Supplier invoice #</label>
                 <input type="text" wire:model="invoice_number" class="field-input">
+            </div>
+            <div>
+                <label class="field-label">Purchase date</label>
+                <input type="date" wire:model="purchase_date" class="field-input">
+                @error('purchase_date') <p class="mt-1 text-xs text-status-unpaid">{{ $message }}</p> @enderror
             </div>
         </div>
 
